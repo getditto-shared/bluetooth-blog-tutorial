@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -101,7 +101,6 @@
 				371A64039425ECD7E35DBB5D /* Pods-BluetoothChat.debug.xcconfig */,
 				B7C2B71553C038D7B99043E6 /* Pods-BluetoothChat.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -121,6 +120,7 @@
 			buildConfigurationList = 22EF8597246D1F39003E1D8D /* Build configuration list for PBXNativeTarget "BluetoothChat" */;
 			buildPhases = (
 				0F025BE8CE0DD508BBDA13AE /* [CP] Check Pods Manifest.lock */,
+				22EF859D246D29AF003E1D8D /* Run SwiftLint */,
 				22EF857F246D1F38003E1D8D /* Sources */,
 				22EF8580246D1F38003E1D8D /* Frameworks */,
 				22EF8581246D1F38003E1D8D /* Resources */,
@@ -202,6 +202,24 @@
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
+		};
+		22EF859D246D29AF003E1D8D /* Run SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run SwiftLint";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/SwiftLint/swiftlint\"\n";
 		};
 		5F78EF15DFC6702084785C0A /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
