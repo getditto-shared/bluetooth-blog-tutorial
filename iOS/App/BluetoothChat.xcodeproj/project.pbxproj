@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		22D875612472CFCD00A2FD4C /* BluetoothCentralManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22D875602472CFCD00A2FD4C /* BluetoothCentralManager.swift */; };
+		22D875632472D3CB00A2FD4C /* BluetoothRole.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22D875622472D3CB00A2FD4C /* BluetoothRole.swift */; };
+		22D875662472D4BA00A2FD4C /* BluetoothService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22D875652472D4BA00A2FD4C /* BluetoothService.swift */; };
 		22EF8587246D1F38003E1D8D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22EF8586246D1F38003E1D8D /* AppDelegate.swift */; };
 		22EF8589246D1F38003E1D8D /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22EF8588246D1F38003E1D8D /* SceneDelegate.swift */; };
 		22EF858B246D1F38003E1D8D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22EF858A246D1F38003E1D8D /* ViewController.swift */; };
@@ -16,6 +19,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		22D875602472CFCD00A2FD4C /* BluetoothCentralManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothCentralManager.swift; sourceTree = "<group>"; };
+		22D875622472D3CB00A2FD4C /* BluetoothRole.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothRole.swift; sourceTree = "<group>"; };
+		22D875652472D4BA00A2FD4C /* BluetoothService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothService.swift; sourceTree = "<group>"; };
 		22EF8583246D1F38003E1D8D /* BluetoothChat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BluetoothChat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		22EF8586246D1F38003E1D8D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		22EF8588246D1F38003E1D8D /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -40,6 +46,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		22D8755F2472CFAD00A2FD4C /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				22D875602472CFCD00A2FD4C /* BluetoothCentralManager.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		22D875642472D49B00A2FD4C /* Constants */ = {
+			isa = PBXGroup;
+			children = (
+				22D875622472D3CB00A2FD4C /* BluetoothRole.swift */,
+				22D875652472D4BA00A2FD4C /* BluetoothService.swift */,
+			);
+			path = Constants;
+			sourceTree = "<group>";
+		};
 		22EF857A246D1F38003E1D8D = {
 			isa = PBXGroup;
 			children = (
@@ -63,8 +86,10 @@
 			children = (
 				22EF8586246D1F38003E1D8D /* AppDelegate.swift */,
 				22EF8588246D1F38003E1D8D /* SceneDelegate.swift */,
+				22D875642472D49B00A2FD4C /* Constants */,
 				22EF859A246D2184003E1D8D /* Controllers */,
 				22EF859B246D218F003E1D8D /* Resources */,
+				22D8755F2472CFAD00A2FD4C /* Services */,
 				22EF859C246D21A5003E1D8D /* Supporting */,
 			);
 			path = BluetoothChat;
@@ -247,7 +272,10 @@
 			files = (
 				22EF858B246D1F38003E1D8D /* ViewController.swift in Sources */,
 				22EF8587246D1F38003E1D8D /* AppDelegate.swift in Sources */,
+				22D875612472CFCD00A2FD4C /* BluetoothCentralManager.swift in Sources */,
 				22EF8589246D1F38003E1D8D /* SceneDelegate.swift in Sources */,
+				22D875662472D4BA00A2FD4C /* BluetoothService.swift in Sources */,
+				22D875632472D3CB00A2FD4C /* BluetoothRole.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
