@@ -206,7 +206,9 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
     }
 
     /// The peripheral returned back whether our subscription to the characteristic was successful or not
-    func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
+    func peripheral(_ peripheral: CBPeripheral,
+                    didUpdateNotificationStateFor characteristic: CBCharacteristic,
+                    error: Error?) {
         // Perform any error handling if one occurred
         if let error = error {
             print("Characteristic update notification failed: \(error.localizedDescription)")

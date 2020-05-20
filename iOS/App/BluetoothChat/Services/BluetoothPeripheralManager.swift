@@ -96,9 +96,10 @@ extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
     }
 
     /// Called when someone else has subscribed to our characteristic, allowing us to send them data
-    func peripheralManager(_ peripheral: CBPeripheralManager, central: CBCentral, didSubscribeTo characteristic: CBCharacteristic) {
+    func peripheralManager(_ peripheral: CBPeripheralManager,
+                           central: CBCentral,
+                           didSubscribeTo characteristic: CBCharacteristic) {
         print("A central has subscribed to the peripheral")
-
 
         if let characteristic = self.characteristic {
             // Send a message to the central
@@ -108,7 +109,9 @@ extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
     }
 
     /// Called when the subscribing central has unsubscribed from us
-    func peripheralManager(_ peripheral: CBPeripheralManager, central: CBCentral, didUnsubscribeFrom characteristic: CBCharacteristic) {
+    func peripheralManager(_ peripheral: CBPeripheralManager,
+                           central: CBCentral,
+                           didUnsubscribeFrom characteristic: CBCharacteristic) {
         print("The central has unsubscribed from the peripheral")
     }
 }
