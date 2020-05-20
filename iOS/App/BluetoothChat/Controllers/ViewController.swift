@@ -10,10 +10,13 @@ import UIKit
 
 class ViewController: UIViewController {
 
+    //private var bluetoothCentral = BluetoothCentralManager()
+    private var bluetoothPeripheral = BluetoothPeripheralManager()
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
-    }
-    
-}
 
+        //bluetoothCentral.start()
+        bluetoothPeripheral.start()
+    }
+}
