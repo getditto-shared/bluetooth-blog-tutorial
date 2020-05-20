@@ -49,6 +49,8 @@ extension BluetoothPeripheralManager {
 }
 
 extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
+
+    /// Called whenever the Bluetooth state of this peripheral has changed
     func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
         // Print out which state Bluetooth just entered
         switch peripheral.state {
@@ -91,5 +93,22 @@ extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
         if advertPending {
             startAdvertising()
         }
+    }
+
+    /// Called when someone else has subscribed to our characteristic, allowing us to send them data
+    func peripheralManager(_ peripheral: CBPeripheralManager, central: CBCentral, didSubscribeTo characteristic: CBCharacteristic) {
+        print("A central has subscribed to the peripheral")
+
+
+        if let characteristic = self.characteristic {
+            // Send a message to the central
+            let data = "Hello!".data(using: .utf8)!
+            peripheralManager?.updateValue(data, for: characteristic, onSubscribedCentrals: nil)
+        }
+    }
+
+    /// Called when the subscribing central has unsubscribed from us
+    func peripheralManager(_ peripheral: CBPeripheralManager, central: CBCentral, didUnsubscribeFrom characteristic: CBCharacteristic) {
+        print("The central has unsubscribed from the peripheral")
     }
 }
