@@ -38,7 +38,7 @@ extension BluetoothPeripheralManager {
         guard !(peripheralManager?.isAdvertising ?? true) else { return }
 
         let advertisementData: [String: Any] = [CBAdvertisementDataLocalNameKey: "XD",
-                                                 CBAdvertisementDataServiceUUIDsKey: [BluetoothService.chatServiceID]]
+                                                 CBAdvertisementDataServiceUUIDsKey: [BluetoothService.chatID]]
 
         peripheralManager?.startAdvertising(advertisementData)
         advertPending = false
