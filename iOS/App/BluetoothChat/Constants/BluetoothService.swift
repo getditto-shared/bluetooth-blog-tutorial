@@ -15,4 +15,5 @@ import CoreBluetooth
 /// that we can detect when scanning
 struct BluetoothService {
     static let chatServiceID = CBUUID(string: "42332fe8-9915-11ea-bb37-0242ac130002")
+    static let chatCharacteristicID = CBUUID(string: "f0ab5a15-b003-4653-a248-73fd504c128f")
 }
