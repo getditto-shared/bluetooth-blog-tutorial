@@ -16,6 +16,9 @@ final class BluetoothPeripheralManager: NSObject {
     // The Core Bluetooth object that manages our state as a peripheral
     private var peripheralManager: CBPeripheralManager?
 
+    // The characteristic contained in the service that controls the chat data flow
+    private var characteristic: CBMutableCharacteristic?
+
     // Whether advertising has been deferred
     private var advertPending = false
 
@@ -47,6 +50,7 @@ extension BluetoothPeripheralManager {
 
 extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
     func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
+        // Print out which state Bluetooth just entered
         switch peripheral.state {
         case .unknown:
             print("Bluetooth state has changed to is .unknown")
@@ -60,9 +64,32 @@ extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
             print("Bluetooth state has changed to is .poweredOff")
         case .poweredOn:
             print("Bluetooth state has changed to is .poweredOn")
-            if advertPending { startAdvertising() }
         @unknown default:
             print("Bluetooth state has changed to an unknown state")
+        }
+
+        // Once we're powered on, configure the peripheral with the services
+        // and characteristics we intend to support
+
+        guard peripheral.state == .poweredOn else { return }
+
+        // Create the characteristic which will be the conduit for our chat data
+        characteristic = CBMutableCharacteristic(type: BluetoothCharacteristic.chatID,
+                                                 properties: .notify,
+                                                 value: nil,
+                                                 permissions: .writeable)
+
+        // Create the service that will represent this characteristic
+        let service = CBMutableService(type: BluetoothService.chatID, primary: true)
+        service.characteristics = [self.characteristic!]
+
+        // Register this service to the peripheral so it can now be advertised
+        peripheralManager?.add(service)
+
+        // If we had already requested advertising before Bluetooth finished
+        // powering up, start now
+        if advertPending {
+            startAdvertising()
         }
     }
 }
