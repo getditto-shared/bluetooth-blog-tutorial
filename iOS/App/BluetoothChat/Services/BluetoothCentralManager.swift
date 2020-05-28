@@ -22,6 +22,9 @@ final class BluetoothCentralManager: NSObject {
     // The peripheral we've connected to
     private var peripheral: CBPeripheral?
 
+    // The characteristic of the service that carries out chat data
+    private var characteristic: CBCharacteristic?
+
     /// Start scanning for peripherals in the area
     public func start() {
         // Create the central manager (This will also kickstart launching Bluetooth)
@@ -190,6 +193,9 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
 
             // Subscribe to this characteristic, so we can be notified when data comes from it
             peripheral.setNotifyValue(true, for: characteristic)
+
+            // Hold onto a reference for this characteristic for sending data
+            self.characteristic = characteristic
         }
     }
 
@@ -225,5 +231,9 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
             print("Characteristic notifications have stopped. Disconnecting.")
             centralManager?.cancelPeripheralConnection(peripheral)
         }
+
+        // Send data to the peripheral
+        let data = "Hello!".data(using: .utf8)!
+        self.peripheral!.writeValue(data, for: self.characteristic!, type: .withResponse)
     }
 }
