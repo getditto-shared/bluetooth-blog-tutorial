@@ -19,6 +19,9 @@ final class BluetoothPeripheralManager: NSObject {
     // The characteristic contained in the service that controls the chat data flow
     private var characteristic: CBMutableCharacteristic?
 
+    // The central that we've successfully connected to
+    private var central: CBCentral?
+
     // Whether advertising has been deferred
     private var advertPending = false
 
@@ -77,7 +80,7 @@ extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
 
         // Create the characteristic which will be the conduit for our chat data
         characteristic = CBMutableCharacteristic(type: BluetoothCharacteristic.chatID,
-                                                 properties: .notify,
+                                                 properties: [.write, .notify],
                                                  value: nil,
                                                  permissions: .writeable)
 
@@ -101,11 +104,14 @@ extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
                            didSubscribeTo characteristic: CBCharacteristic) {
         print("A central has subscribed to the peripheral")
 
-        if let characteristic = self.characteristic {
-            // Send a message to the central
-            let data = "Hello!".data(using: .utf8)!
-            peripheralManager?.updateValue(data, for: characteristic, onSubscribedCentrals: nil)
-        }
+        // Capture the central so we can get information about it later
+        self.central = central
+
+//        if let characteristic = self.characteristic {
+//            // Send a message to the central
+//            let data = "Hello!".data(using: .utf8)!
+//            peripheralManager?.updateValue(data, for: characteristic, onSubscribedCentrals: [central])
+//        }
     }
 
     /// Called when the subscribing central has unsubscribed from us
@@ -114,4 +120,10 @@ extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
                            didUnsubscribeFrom characteristic: CBCharacteristic) {
         print("The central has unsubscribed from the peripheral")
     }
+
+    /// Called when the central has sent a message to this peripheral
+    func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveWrite requests: [CBATTRequest]) {
+        //print(requests)
+    }
+
 }
