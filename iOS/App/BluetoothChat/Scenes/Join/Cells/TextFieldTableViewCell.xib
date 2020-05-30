@@ -19,9 +19,9 @@
                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Ditto" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="kWS-6d-Bbm" userLabel="TextField">
                         <rect key="frame" x="16" y="11" width="288" height="22"/>
                         <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
-                        <textInputTraits key="textInputTraits" autocapitalizationType="words"/>
+                        <textInputTraits key="textInputTraits" autocapitalizationType="words" returnKeyType="done"/>
                         <connections>
-                            <outlet property="delegate" destination="-1" id="uHU-6E-QPd"/>
+                            <outlet property="delegate" destination="KGk-i7-Jjw" id="G6L-UF-PDa"/>
                         </connections>
                     </textField>
                 </subviews>
