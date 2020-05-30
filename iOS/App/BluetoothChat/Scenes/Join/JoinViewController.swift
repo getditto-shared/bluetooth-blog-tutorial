@@ -39,6 +39,13 @@ class JoinViewController: UITableViewController {
                            forCellReuseIdentifier: JoinViewController.deviceCellIdentifier)
         tableView.register(UINib(nibName: "TextFieldTableViewCell", bundle: nil),
                            forCellReuseIdentifier: JoinViewController.nameCellIdentifier)
+
+        // Set up the header view
+        if let headerView = UINib(nibName: "JoinTableHeaderView", bundle: nil)
+            .instantiate(withOwner: nil, options: nil)
+            .first as? UIView {
+        tableView.tableHeaderView = headerView
+        }
     }
 
     override func viewDidAppear(_ animated: Bool) {
