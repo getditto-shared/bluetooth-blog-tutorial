@@ -10,6 +10,8 @@ import UIKit
 
 class TextFieldTableViewCell: UITableViewCell, UITextFieldDelegate {
 
+    @IBOutlet weak var textField: UITextField!
+    
     // MARK: Text Field Delegate
 
     func textFieldDidEndEditing(_ textField: UITextField) {
