@@ -10,8 +10,14 @@ import UIKit
 
 class TextFieldTableViewCell: UITableViewCell, UITextFieldDelegate {
 
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        
+    // MARK: Text Field Delegate
+
+    func textFieldDidEndEditing(_ textField: UITextField) {
+
     }
+
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        return true
+    }
+
 }
