@@ -15,8 +15,12 @@ struct Sections {
 
 class JoinViewController: UITableViewController {
 
+    // The static identifiers for the cells we'll be using
     static let deviceCellIdentifier = "DeviceCell"
     static let nameCellIdentifier = "NameCell"
+
+    // The name of this device
+    private var deviceName = UIDevice.current.name
 
     // MARK: - Class Creation -
 
@@ -72,6 +76,7 @@ class JoinViewController: UITableViewController {
             let cell = tableView.dequeueReusableCell(withIdentifier: JoinViewController.nameCellIdentifier,
                                                      for: indexPath)
             if let nameCell = cell as? TextFieldTableViewCell {
+                nameCell.textField.text = deviceName
                 // Configure callbacks 
             }
 
