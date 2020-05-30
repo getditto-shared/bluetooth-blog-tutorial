@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		227370E824829A8C00FC6434 /* JoinTableHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227370E724829A8C00FC6434 /* JoinTableHeaderView.xib */; };
+		227370EC2482CA6B00FC6434 /* JoinTableHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 227370EB2482CA6B00FC6434 /* JoinTableHeaderView.swift */; };
+		22A78D902480C72E00CFA136 /* JoinViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A78D8E2480C72E00CFA136 /* JoinViewController.swift */; };
+		22A78D942480E44B00CFA136 /* TextFieldTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A78D922480E44B00CFA136 /* TextFieldTableViewCell.swift */; };
+		22A78D952480E44B00CFA136 /* TextFieldTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22A78D932480E44B00CFA136 /* TextFieldTableViewCell.xib */; };
+		22A78D972480F6B800CFA136 /* DeviceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A78D962480F6B800CFA136 /* DeviceTableViewCell.swift */; };
 		22D875612472CFCD00A2FD4C /* BluetoothCentralManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22D875602472CFCD00A2FD4C /* BluetoothCentralManager.swift */; };
 		22D875632472D3CB00A2FD4C /* BluetoothRole.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22D875622472D3CB00A2FD4C /* BluetoothRole.swift */; };
 		22D875662472D4BA00A2FD4C /* BluetoothConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22D875652472D4BA00A2FD4C /* BluetoothConstants.swift */; };
@@ -20,6 +26,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		227370E724829A8C00FC6434 /* JoinTableHeaderView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = JoinTableHeaderView.xib; sourceTree = "<group>"; };
+		227370EB2482CA6B00FC6434 /* JoinTableHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinTableHeaderView.swift; sourceTree = "<group>"; };
+		22A78D8E2480C72E00CFA136 /* JoinViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinViewController.swift; sourceTree = "<group>"; };
+		22A78D922480E44B00CFA136 /* TextFieldTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldTableViewCell.swift; sourceTree = "<group>"; };
+		22A78D932480E44B00CFA136 /* TextFieldTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextFieldTableViewCell.xib; sourceTree = "<group>"; };
+		22A78D962480F6B800CFA136 /* DeviceTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceTableViewCell.swift; sourceTree = "<group>"; };
 		22D875602472CFCD00A2FD4C /* BluetoothCentralManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothCentralManager.swift; sourceTree = "<group>"; };
 		22D875622472D3CB00A2FD4C /* BluetoothRole.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothRole.swift; sourceTree = "<group>"; };
 		22D875652472D4BA00A2FD4C /* BluetoothConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothConstants.swift; sourceTree = "<group>"; };
@@ -48,6 +60,43 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		227370E92482C83C00FC6434 /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				22A78D962480F6B800CFA136 /* DeviceTableViewCell.swift */,
+				22A78D922480E44B00CFA136 /* TextFieldTableViewCell.swift */,
+				22A78D932480E44B00CFA136 /* TextFieldTableViewCell.xib */,
+			);
+			path = Cells;
+			sourceTree = "<group>";
+		};
+		227370EA2482C84600FC6434 /* Accessories */ = {
+			isa = PBXGroup;
+			children = (
+				227370E724829A8C00FC6434 /* JoinTableHeaderView.xib */,
+				227370EB2482CA6B00FC6434 /* JoinTableHeaderView.swift */,
+			);
+			path = Accessories;
+			sourceTree = "<group>";
+		};
+		22A78D882480C51E00CFA136 /* Scenes */ = {
+			isa = PBXGroup;
+			children = (
+				22A78D892480C66900CFA136 /* Join */,
+			);
+			path = Scenes;
+			sourceTree = "<group>";
+		};
+		22A78D892480C66900CFA136 /* Join */ = {
+			isa = PBXGroup;
+			children = (
+				22A78D8E2480C72E00CFA136 /* JoinViewController.swift */,
+				227370EA2482C84600FC6434 /* Accessories */,
+				227370E92482C83C00FC6434 /* Cells */,
+			);
+			path = Join;
+			sourceTree = "<group>";
+		};
 		22D8755F2472CFAD00A2FD4C /* Services */ = {
 			isa = PBXGroup;
 			children = (
@@ -92,6 +141,7 @@
 				22D875642472D49B00A2FD4C /* Constants */,
 				22EF859A246D2184003E1D8D /* Controllers */,
 				22EF859B246D218F003E1D8D /* Resources */,
+				22A78D882480C51E00CFA136 /* Scenes */,
 				22D8755F2472CFAD00A2FD4C /* Services */,
 				22EF859C246D21A5003E1D8D /* Supporting */,
 			);
@@ -201,7 +251,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				227370E824829A8C00FC6434 /* JoinTableHeaderView.xib in Resources */,
 				22EF8593246D1F39003E1D8D /* LaunchScreen.storyboard in Resources */,
+				22A78D952480E44B00CFA136 /* TextFieldTableViewCell.xib in Resources */,
 				22EF8590246D1F39003E1D8D /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -275,9 +327,13 @@
 			files = (
 				22EF858B246D1F38003E1D8D /* ViewController.swift in Sources */,
 				22EF8587246D1F38003E1D8D /* AppDelegate.swift in Sources */,
+				22A78D902480C72E00CFA136 /* JoinViewController.swift in Sources */,
 				22D875612472CFCD00A2FD4C /* BluetoothCentralManager.swift in Sources */,
 				22EF8589246D1F38003E1D8D /* SceneDelegate.swift in Sources */,
+				227370EC2482CA6B00FC6434 /* JoinTableHeaderView.swift in Sources */,
+				22A78D972480F6B800CFA136 /* DeviceTableViewCell.swift in Sources */,
 				22D875662472D4BA00A2FD4C /* BluetoothConstants.swift in Sources */,
+				22A78D942480E44B00CFA136 /* TextFieldTableViewCell.swift in Sources */,
 				22D875632472D3CB00A2FD4C /* BluetoothRole.swift in Sources */,
 				22D875682472E1D500A2FD4C /* BluetoothPeripheralManager.swift in Sources */,
 			);
