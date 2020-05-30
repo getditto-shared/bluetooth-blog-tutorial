@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		227370E824829A8C00FC6434 /* JoinTableHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227370E724829A8C00FC6434 /* JoinTableHeaderView.xib */; };
 		22A78D902480C72E00CFA136 /* JoinViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A78D8E2480C72E00CFA136 /* JoinViewController.swift */; };
 		22A78D942480E44B00CFA136 /* TextFieldTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A78D922480E44B00CFA136 /* TextFieldTableViewCell.swift */; };
 		22A78D952480E44B00CFA136 /* TextFieldTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22A78D932480E44B00CFA136 /* TextFieldTableViewCell.xib */; };
@@ -24,6 +25,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		227370E724829A8C00FC6434 /* JoinTableHeaderView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = JoinTableHeaderView.xib; sourceTree = "<group>"; };
 		22A78D8E2480C72E00CFA136 /* JoinViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinViewController.swift; sourceTree = "<group>"; };
 		22A78D922480E44B00CFA136 /* TextFieldTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldTableViewCell.swift; sourceTree = "<group>"; };
 		22A78D932480E44B00CFA136 /* TextFieldTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextFieldTableViewCell.xib; sourceTree = "<group>"; };
@@ -71,6 +73,7 @@
 				22A78D922480E44B00CFA136 /* TextFieldTableViewCell.swift */,
 				22A78D962480F6B800CFA136 /* DeviceTableViewCell.swift */,
 				22A78D932480E44B00CFA136 /* TextFieldTableViewCell.xib */,
+				227370E724829A8C00FC6434 /* JoinTableHeaderView.xib */,
 			);
 			path = Join;
 			sourceTree = "<group>";
@@ -229,6 +232,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				227370E824829A8C00FC6434 /* JoinTableHeaderView.xib in Resources */,
 				22EF8593246D1F39003E1D8D /* LaunchScreen.storyboard in Resources */,
 				22A78D952480E44B00CFA136 /* TextFieldTableViewCell.xib in Resources */,
 				22EF8590246D1F39003E1D8D /* Assets.xcassets in Resources */,
