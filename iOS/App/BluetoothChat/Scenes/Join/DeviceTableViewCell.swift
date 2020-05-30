@@ -10,10 +10,13 @@ import UIKit
 
 class DeviceTableViewCell: UITableViewCell {
 
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
+    // Configure for when a specific device that was found
+    public func configureForDevice(named device: String) {
+
     }
 
-    
+    // Configure for a default placeholder state when no devices are found
+    public func configureForNoDevicesFound() {
 
+    }
 }
