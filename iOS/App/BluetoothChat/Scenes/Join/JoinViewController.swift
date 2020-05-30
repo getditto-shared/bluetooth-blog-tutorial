@@ -82,6 +82,6 @@ class JoinViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         if section == Sections.availableDevices { return "Devices" }
-        return nil
+        return "Device Name"
     }
 }
