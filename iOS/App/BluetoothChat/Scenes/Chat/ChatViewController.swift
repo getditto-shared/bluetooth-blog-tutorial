@@ -27,6 +27,17 @@ class ChatViewController: MessagesViewController {
 
         // Set the title visible in the title bar to the device name
         title = device.peripheral.name ?? device.peripheral.identifier.description
+
+        // Configure ourselves as the delegates for MessageKit
+        messagesCollectionView.messagesDataSource = self
+        messagesCollectionView.messagesLayoutDelegate = self
+        messagesCollectionView.messagesDisplayDelegate = self
+
+        // Suppress the avatars icons
+        if let layout = messagesCollectionView.collectionViewLayout as? MessagesCollectionViewFlowLayout {
+            layout.textMessageSizeCalculator.outgoingAvatarSize = .zero
+            layout.textMessageSizeCalculator.incomingAvatarSize = .zero
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -37,5 +48,22 @@ class ChatViewController: MessagesViewController {
             navigationController.setNavigationBarHidden(false, animated: animated)
         }
     }
-
 }
+
+extension ChatViewController: MessagesDataSource {
+    func currentSender() -> SenderType {
+        return Sender(senderId: "000", displayName: "Ditto")
+    }
+
+    func messageForItem(at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageType {
+        let sender = Sender(senderId: "000", displayName: "Ditto")
+        return Message(sender: sender, message: "Hello World!")
+    }
+
+    func numberOfSections(in messagesCollectionView: MessagesCollectionView) -> Int {
+        return 1
+    }
+}
+
+// Conform to the MessageKit display and layout delegates (But we won't be implementing any logic here)
+extension ChatViewController: MessagesDisplayDelegate, MessagesLayoutDelegate {}
