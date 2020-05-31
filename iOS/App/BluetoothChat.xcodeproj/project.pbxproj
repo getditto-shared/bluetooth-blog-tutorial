@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		221C5782248404D90018A070 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 221C5781248404D90018A070 /* ChatViewController.swift */; };
+		221C5784248407D80018A070 /* Sender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 221C5783248407D80018A070 /* Sender.swift */; };
+		221C57862484087E0018A070 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 221C57852484087E0018A070 /* Message.swift */; };
 		227370E824829A8C00FC6434 /* JoinTableHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227370E724829A8C00FC6434 /* JoinTableHeaderView.xib */; };
 		227370EC2482CA6B00FC6434 /* JoinTableHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 227370EB2482CA6B00FC6434 /* JoinTableHeaderView.swift */; };
 		227370EE24836BAD00FC6434 /* BluetoothDeviceDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 227370ED24836BAD00FC6434 /* BluetoothDeviceDiscovery.swift */; };
@@ -28,6 +30,8 @@
 
 /* Begin PBXFileReference section */
 		221C5781248404D90018A070 /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
+		221C5783248407D80018A070 /* Sender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sender.swift; sourceTree = "<group>"; };
+		221C57852484087E0018A070 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		227370E724829A8C00FC6434 /* JoinTableHeaderView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = JoinTableHeaderView.xib; sourceTree = "<group>"; };
 		227370EB2482CA6B00FC6434 /* JoinTableHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinTableHeaderView.swift; sourceTree = "<group>"; };
 		227370ED24836BAD00FC6434 /* BluetoothDeviceDiscovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothDeviceDiscovery.swift; sourceTree = "<group>"; };
@@ -93,6 +97,8 @@
 			isa = PBXGroup;
 			children = (
 				227370F024837EA800FC6434 /* Device.swift */,
+				221C57852484087E0018A070 /* Message.swift */,
+				221C5783248407D80018A070 /* Sender.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -346,8 +352,10 @@
 				22A78D972480F6B800CFA136 /* DeviceTableViewCell.swift in Sources */,
 				22D875662472D4BA00A2FD4C /* BluetoothConstants.swift in Sources */,
 				22A78D942480E44B00CFA136 /* TextFieldTableViewCell.swift in Sources */,
+				221C5784248407D80018A070 /* Sender.swift in Sources */,
 				221C5782248404D90018A070 /* ChatViewController.swift in Sources */,
 				22D875682472E1D500A2FD4C /* BluetoothPeripheralManager.swift in Sources */,
+				221C57862484087E0018A070 /* Message.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
