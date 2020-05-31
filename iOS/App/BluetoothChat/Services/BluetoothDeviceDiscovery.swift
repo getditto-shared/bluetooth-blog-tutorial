@@ -103,7 +103,6 @@ extension BluetoothDeviceDiscovery: CBCentralManagerDelegate {
         // Attempt to get the user-set device name of this peripheral
         if let deviceName = advertisementData[CBAdvertisementDataLocalNameKey] as? String {
             name = deviceName
-            print(deviceName)
         }
 
         // Capture all of this in a device object
