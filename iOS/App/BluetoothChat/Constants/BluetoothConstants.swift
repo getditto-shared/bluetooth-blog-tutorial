@@ -22,4 +22,3 @@ struct BluetoothConstants {
     /// a characteristic that is used to move data between devices.
     static let chatCharacteristicID = CBUUID(string: "f0ab5a15-b003-4653-a248-73fd504c128f")
 }
-

@@ -52,7 +52,7 @@ extension BluetoothCentralManager {
     fileprivate func startScanning() {
         guard !(centralManager?.isScanning ?? true) else { return }
 
-        centralManager?.scanForPeripherals(withServices: [BluetoothService.chatID], options: nil)
+        centralManager?.scanForPeripherals(withServices: [BluetoothConstants.chatServiceID], options: nil)
 
         scanPending = false
     }
@@ -68,7 +68,7 @@ extension BluetoothCentralManager {
         // and if any were configured to notify us, disconnect them
         peripheral.services?.forEach { service in
             service.characteristics?.forEach { characteristic in
-                if characteristic.uuid != BluetoothCharacteristic.chatID { return }
+                if characteristic.uuid != BluetoothConstants.chatCharacteristicID { return }
                 if characteristic.isNotifying {
                     peripheral.setNotifyValue(false, for: characteristic)
                 }
@@ -143,7 +143,7 @@ extension BluetoothCentralManager: CBCentralManagerDelegate {
         peripheral.delegate = self
 
         // Query the peripheral for the service we want, so we can then access the characteristic
-        peripheral.discoverServices([BluetoothService.chatID])
+        peripheral.discoverServices([BluetoothConstants.chatServiceID])
     }
 
     /// Called when our peripheral was disconnected
@@ -174,7 +174,7 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
         // It's possible there may be more than one service, so loop through each one to discover
         // the characteristic that we want
         peripheral.services?.forEach { service in
-            peripheral.discoverCharacteristics([BluetoothCharacteristic.chatID], for: service)
+            peripheral.discoverCharacteristics([BluetoothConstants.chatCharacteristicID], for: service)
         }
     }
 
@@ -189,7 +189,7 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
 
         // Perform a loop in case we received more than one
         service.characteristics?.forEach { characteristic in
-            guard characteristic.uuid == BluetoothCharacteristic.chatID else { return }
+            guard characteristic.uuid == BluetoothConstants.chatCharacteristicID else { return }
 
             // Subscribe to this characteristic, so we can be notified when data comes from it
             peripheral.setNotifyValue(true, for: characteristic)
@@ -222,7 +222,7 @@ extension BluetoothCentralManager: CBPeripheralDelegate {
         }
 
         // Ensure this characteristic is the one we configured
-        guard characteristic.uuid == BluetoothCharacteristic.chatID else { return }
+        guard characteristic.uuid == BluetoothConstants.chatCharacteristicID else { return }
 
         // Check if it is successfully set as notifying
         if characteristic.isNotifying {
