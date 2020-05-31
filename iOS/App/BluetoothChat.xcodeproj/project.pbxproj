@@ -10,6 +10,7 @@
 		227370E824829A8C00FC6434 /* JoinTableHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227370E724829A8C00FC6434 /* JoinTableHeaderView.xib */; };
 		227370EC2482CA6B00FC6434 /* JoinTableHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 227370EB2482CA6B00FC6434 /* JoinTableHeaderView.swift */; };
 		227370EE24836BAD00FC6434 /* BluetoothDeviceDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 227370ED24836BAD00FC6434 /* BluetoothDeviceDiscovery.swift */; };
+		227370F124837EA800FC6434 /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = 227370F024837EA800FC6434 /* Device.swift */; };
 		22A78D902480C72E00CFA136 /* JoinViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A78D8E2480C72E00CFA136 /* JoinViewController.swift */; };
 		22A78D942480E44B00CFA136 /* TextFieldTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A78D922480E44B00CFA136 /* TextFieldTableViewCell.swift */; };
 		22A78D952480E44B00CFA136 /* TextFieldTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22A78D932480E44B00CFA136 /* TextFieldTableViewCell.xib */; };
@@ -28,6 +29,7 @@
 		227370E724829A8C00FC6434 /* JoinTableHeaderView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = JoinTableHeaderView.xib; sourceTree = "<group>"; };
 		227370EB2482CA6B00FC6434 /* JoinTableHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinTableHeaderView.swift; sourceTree = "<group>"; };
 		227370ED24836BAD00FC6434 /* BluetoothDeviceDiscovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothDeviceDiscovery.swift; sourceTree = "<group>"; };
+		227370F024837EA800FC6434 /* Device.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
 		22A78D8E2480C72E00CFA136 /* JoinViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinViewController.swift; sourceTree = "<group>"; };
 		22A78D922480E44B00CFA136 /* TextFieldTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldTableViewCell.swift; sourceTree = "<group>"; };
 		22A78D932480E44B00CFA136 /* TextFieldTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextFieldTableViewCell.xib; sourceTree = "<group>"; };
@@ -75,6 +77,14 @@
 				227370EB2482CA6B00FC6434 /* JoinTableHeaderView.swift */,
 			);
 			path = Accessories;
+			sourceTree = "<group>";
+		};
+		227370EF24837E9100FC6434 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				227370F024837EA800FC6434 /* Device.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		22A78D882480C51E00CFA136 /* Scenes */ = {
@@ -137,6 +147,7 @@
 				22EF8586246D1F38003E1D8D /* AppDelegate.swift */,
 				22EF8588246D1F38003E1D8D /* SceneDelegate.swift */,
 				22D875642472D49B00A2FD4C /* Constants */,
+				227370EF24837E9100FC6434 /* Models */,
 				22EF859B246D218F003E1D8D /* Resources */,
 				22A78D882480C51E00CFA136 /* Scenes */,
 				22D8755F2472CFAD00A2FD4C /* Services */,
@@ -314,6 +325,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				227370F124837EA800FC6434 /* Device.swift in Sources */,
 				22EF8587246D1F38003E1D8D /* AppDelegate.swift in Sources */,
 				227370EE24836BAD00FC6434 /* BluetoothDeviceDiscovery.swift in Sources */,
 				22A78D902480C72E00CFA136 /* JoinViewController.swift in Sources */,
