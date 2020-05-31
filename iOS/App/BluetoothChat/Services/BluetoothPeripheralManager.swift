@@ -44,7 +44,7 @@ extension BluetoothPeripheralManager {
         guard !(peripheralManager?.isAdvertising ?? true) else { return }
 
         let advertisementData: [String: Any] = [CBAdvertisementDataLocalNameKey: "XD",
-                                                 CBAdvertisementDataServiceUUIDsKey: [BluetoothService.chatID]]
+                                                 CBAdvertisementDataServiceUUIDsKey: [BluetoothConstants.chatServiceID]]
 
         peripheralManager?.startAdvertising(advertisementData)
         advertPending = false
@@ -79,13 +79,13 @@ extension BluetoothPeripheralManager: CBPeripheralManagerDelegate {
         guard peripheral.state == .poweredOn else { return }
 
         // Create the characteristic which will be the conduit for our chat data
-        characteristic = CBMutableCharacteristic(type: BluetoothCharacteristic.chatID,
+        characteristic = CBMutableCharacteristic(type: BluetoothConstants.chatCharacteristicID,
                                                  properties: [.write, .notify],
                                                  value: nil,
                                                  permissions: .writeable)
 
         // Create the service that will represent this characteristic
-        let service = CBMutableService(type: BluetoothService.chatID, primary: true)
+        let service = CBMutableService(type: BluetoothConstants.chatServiceID, primary: true)
         service.characteristics = [self.characteristic!]
 
         // Register this service to the peripheral so it can now be advertised
