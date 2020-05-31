@@ -11,10 +11,10 @@ import UIKit
 class DeviceTableViewCell: UITableViewCell {
 
     // Configure for when a specific device that was found
-    public func configureForDevice(named device: String) {
+    public func configureForDevice(named device: String, selectable: Bool = true) {
         textLabel?.alpha = 1.0
-        selectionStyle = .blue
-        accessoryType = .disclosureIndicator
+        selectionStyle = selectable ? .blue : .none
+        accessoryType = selectable ? .disclosureIndicator : .none
         textLabel?.text = device
     }
 
