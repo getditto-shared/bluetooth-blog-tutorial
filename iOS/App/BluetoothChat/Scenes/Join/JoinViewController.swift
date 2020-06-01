@@ -60,7 +60,9 @@ class JoinViewController: UITableViewController {
         tableView.tableHeaderView = JoinTableHeaderView.instantiate()
     }
 
-    override func viewDidAppear(_ animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
         // If we're in a navigation controller, hide the bar
         if let navigationController = self.navigationController {
             navigationController.setNavigationBarHidden(true, animated: animated)
@@ -133,5 +135,12 @@ extension JoinViewController {
 extension JoinViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+
+        guard indexPath.section == Sections.availableDevices else { return }
+
+        // Create a chat view controller and present it
+        let chatViewController = ChatViewController(device: deviceDiscovery.devices[indexPath.row])
+        navigationController?.pushViewController(chatViewController, animated: true)
+
     }
 }
