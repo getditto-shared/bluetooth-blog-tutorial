@@ -11,11 +11,16 @@ import MessageKit
 
 class ChatViewController: MessagesViewController {
 
+    // The device we'll be communicating with
     private(set) public var device: Device!
+
+    // The Bluetooth service that will handle chats for us
+    private var chatService: BluetoothChatService!
 
     init(device: Device) {
         super.init(nibName: nil, bundle: nil)
         self.device = device
+        self.chatService = BluetoothChatService(device: device)
     }
 
     required init?(coder: NSCoder) {
@@ -38,6 +43,9 @@ class ChatViewController: MessagesViewController {
             layout.textMessageSizeCalculator.outgoingAvatarSize = .zero
             layout.textMessageSizeCalculator.incomingAvatarSize = .zero
         }
+
+        // Send a chat message
+        
     }
 
     override func viewWillAppear(_ animated: Bool) {
