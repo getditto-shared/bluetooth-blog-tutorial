@@ -9,10 +9,23 @@
 import Foundation
 import CoreBluetooth
 
+enum BluetoothChatState {
+    case scanning
+    case advertising
+    case chattingAsCentral
+    case chattingAsPeripheral
+}
+
 class BluetoothChatService: NSObject {
+
+    /// A closure that is called whenever we receive a message from our communicating device
+    public var messageReceivedHandler: ((String) -> Void)?
 
     // The target device we'll be chatting with
     private var device: Device!
+
+    // The current state we are in
+    private var state = BluetoothChatState.scanning
 
     // The central manager that will scan for any peripherals matching our device
     private var centralManager: CBCentralManager?
@@ -23,8 +36,11 @@ class BluetoothChatService: NSObject {
     // The peripheral advertising ourselves
     private var peripheralManager: CBPeripheralManager?
 
+    // If we join the connection as a peripheral, we maintain a reference to our central
+    private var central: CBCentral?
+
     // The characteristic of the service that carries out chat data
-    private var characteristic: CBCharacteristic?
+    private var characteristic: CBMutableCharacteristic?
 
     /// Create a new instance of the chat service with a target device
     /// that we'll be attempting to chat to.
@@ -37,6 +53,26 @@ class BluetoothChatService: NSObject {
 
         // Start the central, scanning immediately
         self.centralManager = CBCentralManager(delegate: self, queue: nil)
+    }
+
+    /// Send a message to our chat target
+    public func send(message: String) {
+        // If we're still in the base state (ie, we haven't established a connection yet),
+        // make this device a peripheral and start advertising
+        if state == .scanning {
+            startAdvertising()
+            return
+        }
+
+
+    }
+
+    private func startAdvertising() {
+        guard peripheralManager == nil else { return }
+
+        // Create the peripheral manager, which will implicitly kick off the
+        // update status delegate
+        peripheralManager = CBPeripheralManager(delegate: self, queue: nil)
     }
 }
 
@@ -72,6 +108,62 @@ extension BluetoothChatService: CBCentralManagerDelegate {
 
         // Scan for the chat characteristic we'll use to communicate
         peripheral.discoverServices([BluetoothConstants.chatServiceID])
+    }
+}
+
+extension BluetoothChatService: CBPeripheralManagerDelegate {
+
+    func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
+        // Once we're powered on, configure the peripheral with the services
+        // and characteristics we intend to support
+
+        guard peripheral.state == .poweredOn else { return }
+
+        // Create the characteristic which will be the conduit for our chat data.
+        // Make sure the properties are set to writeable so we can send data upstream
+        // to the central, and notifiable, so we'll receive callbacks when data comes downstream
+        characteristic = CBMutableCharacteristic(type: BluetoothConstants.chatCharacteristicID,
+                                                 properties: [.write, .notify],
+                                                 value: nil,
+                                                 permissions: .writeable)
+
+        // Create the service that will represent this characteristic
+        let service = CBMutableService(type: BluetoothConstants.chatServiceID, primary: true)
+        service.characteristics = [self.characteristic!]
+
+        // Register this service to the peripheral so it can now be advertised
+        peripheralManager?.add(service)
+
+        // Start advertising as a peripheral
+        let advertisementData: [String: Any] = [CBAdvertisementDataServiceUUIDsKey: [BluetoothConstants.chatServiceID]]
+        peripheralManager?.startAdvertising(advertisementData)
+    }
+
+    func peripheralManager(_ peripheral: CBPeripheralManager,
+                           central: CBCentral,
+                           didSubscribeTo characteristic: CBCharacteristic) {
+        print("A central has subscribed to the peripheral")
+
+        // Capture the central so we can get information about it later
+        self.central = central
+
+        if let characteristic = self.characteristic {
+            // Send a message to the central
+            let data = "Hello!".data(using: .utf8)!
+            peripheralManager?.updateValue(data, for: characteristic, onSubscribedCentrals: [central])
+        }
+    }
+
+    /// Called when the subscribing central has unsubscribed from us
+    func peripheralManager(_ peripheral: CBPeripheralManager,
+                           central: CBCentral,
+                           didUnsubscribeFrom characteristic: CBCharacteristic) {
+        print("The central has unsubscribed from the peripheral")
+    }
+
+    /// Called when the central has sent a message to this peripheral
+    func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveWrite requests: [CBATTRequest]) {
+        print(requests)
     }
 }
 
@@ -131,7 +223,7 @@ extension BluetoothChatService: CBPeripheralDelegate {
             peripheral.setNotifyValue(true, for: characteristic)
 
             // Hold onto a reference for this characteristic for sending data
-            self.characteristic = characteristic
+            self.characteristic = characteristic.mutableCopy() as? CBMutableCharacteristic
         }
     }
 
