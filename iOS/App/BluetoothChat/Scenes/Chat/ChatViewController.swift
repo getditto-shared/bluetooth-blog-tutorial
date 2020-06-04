@@ -54,6 +54,23 @@ class ChatViewController: MessagesViewController {
             layout.textMessageSizeCalculator.outgoingAvatarSize = .zero
             layout.textMessageSizeCalculator.incomingAvatarSize = .zero
         }
+
+        // Subscribe to messages from the chat service
+        chatService.messageReceivedHandler = { [weak self] message in
+            guard let self = self else { return }
+
+            // Fetch the peripheral from where this message came
+            let peripheral = self.device.peripheral
+
+            // Configure a sender
+            let senderId = peripheral.identifier.uuidString
+            let senderName = peripheral.name ?? peripheral.identifier.uuidString
+            let sender = Sender(senderId: senderId, displayName: senderName)
+
+            // Configure a message and submit it
+            let message = Message(sender: sender, message: message)
+            self.appendNewMessage(message)
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
