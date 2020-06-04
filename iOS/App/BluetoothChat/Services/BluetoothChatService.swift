@@ -45,6 +45,9 @@ class BluetoothChatService: NSObject {
     // The characteristic of the service that carries out chat data (when we are a peripheral)
     private var peripheralCharacteristic: CBMutableCharacteristic?
 
+    // While making the connection, buffer any pending message
+    private var pendingMessageData: Data?
+
     /// Create a new instance of the chat service with a target device
     /// that we'll be attempting to chat to.
     /// - Parameter device: The target device we're aiming to chat with
@@ -60,20 +63,47 @@ class BluetoothChatService: NSObject {
 
     /// Send a message to our chat target
     public func send(message: String) {
-        // If we're still in the base state (ie, we haven't established a connection yet),
-        // make this device a peripheral and start advertising
-        if state == .scanning {
+        let messageData = message.data(using: .utf8)!
+
+        switch state {
+        case .scanning:
+            // If we're still in the base state (ie, we haven't established a connection yet),
+            // make this device a peripheral and start advertising
+            pendingMessageData = messageData
             startAdvertising()
-            return
+        case .advertising:
+            // If we're advertising, replace the last message
+            pendingMessageData = messageData
+        case .chattingAsCentral:
+            sendCentralData(messageData)
+        case .chattingAsPeripheral:
+            sendPeripheralData(messageData)
         }
     }
 
     private func startAdvertising() {
-        guard peripheralManager == nil else { return }
+        guard state == .scanning, peripheralManager == nil else { return }
+
+        // Change our state to advertising as a peripheral
+        state = .advertising
 
         // Create the peripheral manager, which will implicitly kick off the
         // update status delegate
         peripheralManager = CBPeripheralManager(delegate: self, queue: nil)
+    }
+
+    private func sendCentralData(_ data: Data) {
+        guard let characteristic = self.centralCharacteristic,
+                    let peripheral = self.peripheral else { return }
+        peripheral.writeValue(data, for: characteristic, type: .withResponse)
+    }
+
+    private func sendPeripheralData(_ data: Data) {
+        guard let characteristic = self.peripheralCharacteristic,
+            let central = self.central else { return }
+
+        peripheralManager?.updateValue(data, for: characteristic,
+                                       onSubscribedCentrals: [central])
     }
 }
 
@@ -83,9 +113,9 @@ extension BluetoothChatService: CBCentralManagerDelegate {
         guard central.state == .poweredOn else { return }
         guard central.isScanning == false else { return }
 
-        // Start scanning for a peripheral that matches our saved device
-        central.scanForPeripherals(withServices: [BluetoothConstants.chatServiceID],
-                                   options: [CBCentralManagerScanOptionAllowDuplicatesKey: false])
+        // Reset state and start scanning
+        resetCentral()
+        startScan()
     }
 
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral,
@@ -98,6 +128,9 @@ extension BluetoothChatService: CBCentralManagerDelegate {
 
         // Retain the peripheral
         self.peripheral = peripheral
+
+        // Change our state to chatting as central
+        state = .chattingAsCentral
     }
 
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
@@ -109,6 +142,42 @@ extension BluetoothChatService: CBCentralManagerDelegate {
 
         // Scan for the chat characteristic we'll use to communicate
         peripheral.discoverServices([BluetoothConstants.chatServiceID])
+    }
+
+    /// An error occurred when attempting to connect to the peripheral
+    func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
+        if let error = error {
+            print(error.localizedDescription)
+        }
+
+        // Reset the state and start scanning
+        resetCentral()
+        startScan()
+    }
+
+    /// The peripheral disconnected
+    func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        if let error = error {
+            print(error.localizedDescription)
+        }
+
+        // Reset the state and start scanning
+        resetCentral()
+        startScan()
+    }
+
+    private func resetCentral() {
+        // Reset all state
+        self.state = .scanning
+        self.peripheral = nil
+    }
+
+    private func startScan() {
+        guard let centralManager = centralManager, !centralManager.isScanning else { return }
+
+        // Start scanning for a peripheral that matches our saved device
+        centralManager.scanForPeripherals(withServices: [BluetoothConstants.chatServiceID],
+                                   options: [CBCentralManagerScanOptionAllowDuplicatesKey: false])
     }
 }
 
@@ -140,18 +209,25 @@ extension BluetoothChatService: CBPeripheralManagerDelegate {
         peripheralManager?.startAdvertising(advertisementData)
     }
 
+    /// Called when someone else has subscribed to our characteristic, allowing us to send them data
     func peripheralManager(_ peripheral: CBPeripheralManager,
                            central: CBCentral,
                            didSubscribeTo characteristic: CBCharacteristic) {
         print("A central has subscribed to the peripheral")
 
+        // Stop scanning as a central now
+        centralManager?.stopScan()
+
+        // Set our state as a full peripheral
+        state = .chattingAsPeripheral
+
         // Capture the central so we can get information about it later
         self.central = central
 
-        if let characteristic = self.peripheralCharacteristic {
-            // Send a message to the central
-            let data = "Hello!".data(using: .utf8)!
-            peripheralManager?.updateValue(data, for: characteristic, onSubscribedCentrals: [central])
+        // If we had a pending message, send it
+        if let data = pendingMessageData {
+            sendPeripheralData(data)
+            pendingMessageData = nil
         }
     }
 
@@ -160,11 +236,22 @@ extension BluetoothChatService: CBPeripheralManagerDelegate {
                            central: CBCentral,
                            didUnsubscribeFrom characteristic: CBCharacteristic) {
         print("The central has unsubscribed from the peripheral")
+
+        // Release the reference to the parent central
+        self.central = nil
+
+        // Resume scanning as a central ourselves
+        centralManager?.scanForPeripherals(withServices: [BluetoothConstants.chatServiceID],
+                                           options: [CBCentralManagerScanOptionAllowDuplicatesKey: false])
     }
 
     /// Called when the central has sent a message to this peripheral
     func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveWrite requests: [CBATTRequest]) {
-        print(requests)
+        guard let request = requests.first, let data = request.value else { return }
+
+        // Decode the message string and trigger the callback
+        let message = String(decoding: data, as: UTF8.self)
+        messageReceivedHandler?(message)
     }
 }
 
@@ -236,6 +323,10 @@ extension BluetoothChatService: CBPeripheralDelegate {
             return
         }
 
+        // Decode the message string and trigger the callback
+        guard let data = characteristic.value else { return }
+        let message = String(decoding: data, as: UTF8.self)
+        messageReceivedHandler?(message)
     }
 
     /// The peripheral returned back whether our subscription to the characteristic was successful or not
@@ -257,6 +348,11 @@ extension BluetoothChatService: CBPeripheralDelegate {
         } else {
             print("Characteristic notifications have stopped. Disconnecting.")
             centralManager?.cancelPeripheralConnection(peripheral)
+        }
+
+        if let data = pendingMessageData {
+            sendCentralData(data)
+            pendingMessageData = nil
         }
     }
 }
