@@ -63,7 +63,7 @@ class BluetoothDeviceDiscovery: NSObject {
 
         // Start advertising with this device's name
         peripheralManager.startAdvertising(
-            [CBAdvertisementDataServiceUUIDsKey: [BluetoothConstants.chatServiceID],
+            [CBAdvertisementDataServiceUUIDsKey: [BluetoothConstants.chatDiscoveryServiceID],
              CBAdvertisementDataLocalNameKey: deviceName])
     }
 
@@ -90,7 +90,7 @@ extension BluetoothDeviceDiscovery: CBCentralManagerDelegate {
         guard central.state == .poweredOn else { return }
 
         // Start scanning for peripherals
-        centralManager.scanForPeripherals(withServices: [BluetoothConstants.chatServiceID],
+        centralManager.scanForPeripherals(withServices: [BluetoothConstants.chatDiscoveryServiceID],
                                           options: [CBCentralManagerScanOptionAllowDuplicatesKey: false])
     }
 
