@@ -39,8 +39,11 @@ class BluetoothChatService: NSObject {
     // If we join the connection as a peripheral, we maintain a reference to our central
     private var central: CBCentral?
 
-    // The characteristic of the service that carries out chat data
-    private var characteristic: CBMutableCharacteristic?
+    // The characteristic of the service that carries out chat data (when we are a central)
+    private var centralCharacteristic: CBCharacteristic?
+
+    // The characteristic of the service that carries out chat data (when we are a peripheral)
+    private var peripheralCharacteristic: CBMutableCharacteristic?
 
     /// Create a new instance of the chat service with a target device
     /// that we'll be attempting to chat to.
@@ -63,8 +66,6 @@ class BluetoothChatService: NSObject {
             startAdvertising()
             return
         }
-
-
     }
 
     private func startAdvertising() {
@@ -122,14 +123,14 @@ extension BluetoothChatService: CBPeripheralManagerDelegate {
         // Create the characteristic which will be the conduit for our chat data.
         // Make sure the properties are set to writeable so we can send data upstream
         // to the central, and notifiable, so we'll receive callbacks when data comes downstream
-        characteristic = CBMutableCharacteristic(type: BluetoothConstants.chatCharacteristicID,
+        peripheralCharacteristic = CBMutableCharacteristic(type: BluetoothConstants.chatCharacteristicID,
                                                  properties: [.write, .notify],
                                                  value: nil,
                                                  permissions: .writeable)
 
         // Create the service that will represent this characteristic
         let service = CBMutableService(type: BluetoothConstants.chatServiceID, primary: true)
-        service.characteristics = [self.characteristic!]
+        service.characteristics = [self.peripheralCharacteristic!]
 
         // Register this service to the peripheral so it can now be advertised
         peripheralManager?.add(service)
@@ -147,7 +148,7 @@ extension BluetoothChatService: CBPeripheralManagerDelegate {
         // Capture the central so we can get information about it later
         self.central = central
 
-        if let characteristic = self.characteristic {
+        if let characteristic = self.peripheralCharacteristic {
             // Send a message to the central
             let data = "Hello!".data(using: .utf8)!
             peripheralManager?.updateValue(data, for: characteristic, onSubscribedCentrals: [central])
@@ -223,7 +224,7 @@ extension BluetoothChatService: CBPeripheralDelegate {
             peripheral.setNotifyValue(true, for: characteristic)
 
             // Hold onto a reference for this characteristic for sending data
-            self.characteristic = characteristic.mutableCopy() as? CBMutableCharacteristic
+            self.centralCharacteristic = characteristic
         }
     }
 
