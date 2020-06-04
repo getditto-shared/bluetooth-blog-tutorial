@@ -136,10 +136,12 @@ extension JoinViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
 
-        guard indexPath.section == Sections.availableDevices else { return }
+        guard indexPath.section == Sections.availableDevices,
+                deviceDiscovery.devices.count > 0 else { return }
 
         // Create a chat view controller and present it
-        let chatViewController = ChatViewController(device: deviceDiscovery.devices[indexPath.row])
+        let chatViewController = ChatViewController(device: deviceDiscovery.devices[indexPath.row],
+                                                    currentDeviceName: deviceName)
         navigationController?.pushViewController(chatViewController, animated: true)
 
     }
