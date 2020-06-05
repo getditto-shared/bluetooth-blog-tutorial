@@ -156,6 +156,7 @@ extension BluetoothChatService: CBCentralManagerDelegate {
         state = .chattingAsCentral
     }
 
+    /// Called when a peripheral has successfully connected to this device (which is acting as a central)
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         // Stop scanning once we've connected
         central.stopScan()
@@ -189,12 +190,14 @@ extension BluetoothChatService: CBCentralManagerDelegate {
         startScan()
     }
 
+    /// Reset all of the state back to default
     private func resetCentral() {
         // Reset all state
         self.state = .scanning
         self.peripheral = nil
     }
 
+    /// Begin scanning for any peripherals matching the chat service we support
     private func startScan() {
         guard let centralManager = centralManager, !centralManager.isScanning else { return }
 
@@ -206,6 +209,7 @@ extension BluetoothChatService: CBCentralManagerDelegate {
 
 extension BluetoothChatService: CBPeripheralManagerDelegate {
 
+    /// Called each time the state of Bluetooth on the device changes
     func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
 
         // Once we're powered on, configure the peripheral with the services
@@ -302,6 +306,8 @@ extension BluetoothChatService: CBPeripheralDelegate {
         centralManager?.cancelPeripheralConnection(peripheral)
     }
 
+    /// Called when the peripheral has discovered all of the services we requested,
+    /// so we can then check those services for the characteristics we need
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         // If an error occurred, print it, and then reset all of the state
         if let error = error {
