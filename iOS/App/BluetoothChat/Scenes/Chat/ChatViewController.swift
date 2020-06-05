@@ -10,6 +10,7 @@ import UIKit
 import MessageKit
 import InputBarAccessoryView
 
+/// The entire UI scene for a chat session with another device
 class ChatViewController: MessagesViewController {
 
     // The device we'll be communicating with
@@ -89,25 +90,39 @@ class ChatViewController: MessagesViewController {
     }
 }
 
+// MARK: - Messages Data Source -
+
 extension ChatViewController: MessagesDataSource {
+
+    /// Used to identiy which sender object represents this device
     func currentSender() -> SenderType {
         return currentDeviceSender
     }
 
-    func messageForItem(at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageType {
-        return messages[indexPath.section]
-    }
-
+    /// Returns the number of chat messages in this session
     func numberOfSections(in messagesCollectionView: MessagesCollectionView) -> Int {
         return messages.count
     }
+
+    /// Returns the messages for each row in this chat view controller
+    func messageForItem(at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageType {
+        return messages[indexPath.section]
+    }
 }
+
+// MARK: - Input Bar Accessory View Delegate -
 
 extension ChatViewController: InputBarAccessoryViewDelegate {
 
+    /// Called when the user taps the "Send" button
     func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
+        // Send the message to our partner in the session
         chatService.send(message: text)
+
+        // Clear the text from the text field
         inputBar.inputTextView.text = nil
+
+        // Insert this message into our local UI
         let message = Message(sender: currentDeviceSender, message: text)
         appendNewMessage(message)
     }

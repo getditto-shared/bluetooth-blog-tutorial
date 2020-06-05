@@ -9,10 +9,13 @@
 import Foundation
 import CoreBluetooth
 
-/// A device, as detected through Bluetooth
-/// service advertisement
+/// A device, as detected through
+/// a Bluetooth service advertisement
 struct Device {
+    /// The peripheral object associated with this device
     let peripheral: CBPeripheral
+
+    /// The reported name of this device
     let name: String
 
     init(peripheral: CBPeripheral, name: String = "Unknown") {
