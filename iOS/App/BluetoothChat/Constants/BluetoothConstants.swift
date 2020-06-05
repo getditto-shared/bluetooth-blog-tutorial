@@ -11,13 +11,12 @@ import CoreBluetooth
 
 struct BluetoothConstants {
 
-    /// Bluetooth devices broadcast their supported capabilities
-    /// (eg, a heart monitor, or a thermometer) as uniquely identified services
-    /// For our chat app, we will define a service used to detect other devices we can connect to
+    /// Bluetooth peripherals advertise their supported capabilities as uniquely identified services
+    /// This service is used when a device is advertising itself to be available to other devices
     static let chatDiscoveryServiceID = CBUUID(string: "42332fe8-9915-11ea-bb37-0242ac130002")
 
-    /// Once two devices have been confirmed to connect to each other, they'll broadcast a different
-    /// service so as to not interfere with device discovery
+    /// Once two devices have decided they will initiate a chat session, this service is used
+    /// in place of the discovery service, so these two devices can identify each other
     static let chatServiceID = CBUUID(string: "43eb0d29-4188-4c84-b1e8-73231e02af95")
 
     /// Bluetooth services contain a number of characteristics, that represent a number

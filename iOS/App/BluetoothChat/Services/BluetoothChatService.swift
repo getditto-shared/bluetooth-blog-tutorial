@@ -9,13 +9,30 @@
 import Foundation
 import CoreBluetooth
 
+// The states that we can be in during a chat session
 enum BluetoothChatState {
-    case scanning
-    case advertising
-    case chattingAsCentral
-    case chattingAsPeripheral
+    case scanning               // Scanning as a central
+    case advertising            // Advertising as a peripheral
+    case chattingAsCentral      // Connected and chatting as a central
+    case chattingAsPeripheral   // Connected and chatting as a peripheral
 }
 
+/// Our main object for managing sending messages
+/// between devices in a single chat session.
+///
+/// When a new object is instantiated, a `Device` object
+/// with the expected target device is provided.
+///
+/// Before anything happens, this object behaves as a central,
+/// and scans for any peripherals to which it can connect.
+/// Upon sending the first chat message, if a connection has not
+/// yet happened yet, that device turns itself into a peripheral and starts
+/// advertising.
+///
+/// Any device with the matching `Device` ID in range will then detect this
+/// advertisement and connect to it, creating the chat session.
+///
+/// The chat sessions are then sent both ways through a single characteristic.
 class BluetoothChatService: NSObject {
 
     /// A closure that is called whenever we receive a message from our communicating device
@@ -92,12 +109,14 @@ class BluetoothChatService: NSObject {
         peripheralManager = CBPeripheralManager(delegate: self, queue: nil)
     }
 
+    /// When we are operating as a central, send a message to our connected peripheral
     private func sendCentralData(_ data: Data) {
         guard let characteristic = self.centralCharacteristic,
                     let peripheral = self.peripheral else { return }
         peripheral.writeValue(data, for: characteristic, type: .withResponse)
     }
 
+    /// When we are operating as a peripheral, send a message to our connected central
     private func sendPeripheralData(_ data: Data) {
         guard let characteristic = self.peripheralCharacteristic,
             let central = self.central else { return }
@@ -109,12 +128,16 @@ class BluetoothChatService: NSObject {
 
 extension BluetoothChatService: CBCentralManagerDelegate {
 
+    /// Called when the state of the device as a Bluetooth central changed
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
+
+        // We can't perform any scans until we're in the powered on state
         guard central.state == .poweredOn else { return }
+
+        // Don't continue if we're already scanning
         guard central.isScanning == false else { return }
 
-        // Reset state and start scanning
-        resetCentral()
+        // Start scanning
         startScan()
     }
 
@@ -133,6 +156,7 @@ extension BluetoothChatService: CBCentralManagerDelegate {
         state = .chattingAsCentral
     }
 
+    /// Called when a peripheral has successfully connected to this device (which is acting as a central)
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         // Stop scanning once we've connected
         central.stopScan()
@@ -150,7 +174,7 @@ extension BluetoothChatService: CBCentralManagerDelegate {
             print(error.localizedDescription)
         }
 
-        // Reset the state and start scanning
+        // Reset the state and start scanning again
         resetCentral()
         startScan()
     }
@@ -166,12 +190,14 @@ extension BluetoothChatService: CBCentralManagerDelegate {
         startScan()
     }
 
+    /// Reset all of the state back to default
     private func resetCentral() {
         // Reset all state
         self.state = .scanning
         self.peripheral = nil
     }
 
+    /// Begin scanning for any peripherals matching the chat service we support
     private func startScan() {
         guard let centralManager = centralManager, !centralManager.isScanning else { return }
 
@@ -183,10 +209,11 @@ extension BluetoothChatService: CBCentralManagerDelegate {
 
 extension BluetoothChatService: CBPeripheralManagerDelegate {
 
+    /// Called each time the state of Bluetooth on the device changes
     func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
+
         // Once we're powered on, configure the peripheral with the services
         // and characteristics we intend to support
-
         guard peripheral.state == .poweredOn else { return }
 
         // Create the characteristic which will be the conduit for our chat data.
@@ -279,6 +306,8 @@ extension BluetoothChatService: CBPeripheralDelegate {
         centralManager?.cancelPeripheralConnection(peripheral)
     }
 
+    /// Called when the peripheral has discovered all of the services we requested,
+    /// so we can then check those services for the characteristics we need
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         // If an error occurred, print it, and then reset all of the state
         if let error = error {

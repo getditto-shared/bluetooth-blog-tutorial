@@ -15,6 +15,7 @@ extension AppDelegate {
     func application(_ application: UIApplication,
                      configurationForConnecting connectingSceneSession: UISceneSession,
                      options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+        // Create a default scene to present our app content
         let sceneConfiguration = UISceneConfiguration(name: "Default", sessionRole: connectingSceneSession.role)
         sceneConfiguration.delegateClass = SceneDelegate.self
         return sceneConfiguration

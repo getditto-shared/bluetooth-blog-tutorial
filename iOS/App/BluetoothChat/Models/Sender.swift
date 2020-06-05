@@ -9,9 +9,12 @@
 import Foundation
 import MessageKit
 
-/// A struct for uniquely identifying
-/// different members in our chat room
+/// When chatting, these types uniquely identify
+/// each user in a given chat room
 struct Sender: SenderType {
+    /// A unique value used to identify a specific user
     var senderId: String
+
+    /// The visible name of this user
     var displayName: String
 }

@@ -9,7 +9,8 @@
 import Foundation
 import MessageKit
 
-/// A struct representing a discrete chat message
+/// A struct representing a single chat message
+/// in our chat sessions
 struct Message: MessageType {
     var sender: SenderType
     var messageId: String
