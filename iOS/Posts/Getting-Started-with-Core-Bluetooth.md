@@ -54,7 +54,9 @@ For any given service, any number of separate sets of information and/or service
 
 As such, services may contain any number of “characteristics” which perform various sub-functions of the service itself. They may be used to receive data from the peripheral, or send commands back to the peripheral. It is possible for centrals to explicitly query for information from a characteristic, or register an observer that will be called every time the characteristic has an update.
 
-### Core Bluetooth Concepts Sum-up
+This concept of Bluetooth devices offering their capabilities as services and characteristics is officially called GATT, which is short for Generic Attribute Profile.
+
+### Core Bluetooth Concepts Summary
 
 Hopefully by this point, the basic layout of how Core Bluetooth will make sense to you. Parent devices are called centrals, and they connect to child devices known as peripherals. Peripherals manage their capabilities as services, which them themselves manage their capabilities via characteristics.
 
@@ -136,13 +138,31 @@ func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
 Once the state of the Bluetooth peripheral is powered on, the peripheral can then start advertising itself.
 
 ```swift
-let service = CBUUID(string: "AAAA") 
+
+let characteristicID = CBUUID(string: "BBBB")
+
+// Create and configure our characteristic     
+let characteristic = CBMutableCharacteristic(type: characteristicID, properties: [.write, .notify], value: nil, permissions: .writeable)
+
+// Create our service, and add our characteristic to it
+let serviceID = CBUUID(string: "AAAA")
+let service = CBMutableService(type: serviceID, primary: true)
+service.characteristics = [characteristic]
+
+// Register this service to our peripheral manager
+peripheralManager.add(service)
+
+// Begin advertising, explicitly requesting it includes our registered service via its identifier
 peripheralManager.startAdvertising(
             [CBAdvertisementDataServiceUUIDsKey: [service],
              CBAdvertisementDataLocalNameKey: "Device Information"])
 ```
 
-When advertising, similar to the central manager, supported services are specified as an array of `CBUUID` objects via the `CBAdvertisementDataServiceUUIDsKey`. One other key that may be used is the `CBAdvertisementDataLocalNameKey` key, which by default contains the name of this device (eg, "Tim's iPhone"), but may be modified to include more information about the state of this device that the central might find useful. For example, for a thermostat device, sending along the current temperate would mean the central device could immediately start displaying information before the connection has even started.
+There's a fair bit to unpack here, but if we step through it one part at time it's nothing too complicated. 
+
+1. We create a characteristic, and assign it the standardised characteristic UUID that the central will be expecting. We also need to explicitly mark the characteristic as writable here, so the central can send data back to the peripheral through it.
+2. We then create a service object, with the standardised service UUID and we set its type to primary to ensure it is advertised as the "main" service of this peripheral.
+3. We then advertise the peripheral with the same service UUID. In addition, while the `CBAdvertisementDataLocalNameKey` key normally holds the device name of this peripheral, it can be modified to hold additional data that the central could potentially use (eg, the current temperature for a thermostat).
 
 ### Detecting a Peripheral from a Central
 
@@ -254,3 +274,162 @@ From here, again, first we do any appropriate error handling if anything failed 
 Secondly, we've received a `service` object, but since a service can have any number of characteristics inside it, we must loop through it to discover the main one we want.
 
 Once we've discovered the characteristic we want, we can then call `peripheral.setNotifyValue()` to `true` in order to start getting notified when the data in it changes.
+
+### Confirming Notifications from the Peripheral was set
+One final step in the process is that the peripheral will report whether setting the characteristic to notify the central was successful or not. Whether it succeeded or failed, the following delegate will be triggered
+
+```swift
+func peripheral(_ peripheral: CBPeripheral,
+                    didUpdateNotificationStateFor characteristic: CBCharacteristic,
+                    error: Error?) {
+	// Perform any error handling if one occurred
+	if let error = error {
+		print("Characteristic update notification failed: \(error.localizedDescription)")
+		return
+	}
+
+	// Ensure this characteristic is the one we configured
+	guard characteristic.uuid == characteristicUUID else { return }
+
+	// Check if it is successfully set as notifying
+  if characteristic.isNotifying {
+		print("Characteristic notifications have begun.")
+	} else {
+		print("Characteristic notifications have stopped. Disconnecting.")
+		centralManager.cancelPeripheralConnection(peripheral)
+	}
+	
+	// Send any info to the peripheral from the central
+}
+```
+While I don't think it is strictly explicitly required to implement this method, if you the subscription failed, it would make sense to detect this and attempt to subscribe (or even just cancel the whole connection) at this point.
+
+Additionally, if the central has data pending it would like to send to the peripheral, this would be best place to send it.
+
+### Sending data to the Peripheral
+Once the central manager has successfully been able to capture both the peripheral and the relevant characteristic, the central can then start sending data to the peripheral via this characteristic. One thing to note is that the characteristic must have been explicitly configured on the peripheral's side to be writable by the central.
+
+At any point after that, it's possible to send data to the peripheral by calling
+
+```swift
+let data = messageString.data(using: .utf8)!
+peripheral.writeValue(data, for: characteristic, type: .withResponse)
+```
+
+The `type` argument lets you specify whether you want the peripheral to reply that it received the data or not. This is great for discerning between types of data that might be explicitly required in a certain order, and data that is often repeated, so if the peripheral didn't catch it, nothing of value was lost.
+
+### Sending data to the Central
+On the flip side, sending data to a central from the peripheral's side is a similar method:
+
+```swift
+let data = messageString.data(using: .utf8)!
+peripheralManager.updateValue(data, for: characteristic, onSubscribedCentrals: [central])
+```
+
+### Receiving Data from a Peripheral
+Finally, after all that, we're ready to start receiving data from the peripheral. In order to be notified of when new data has arrived from a characteristic, you use the following delegate:
+
+```swift
+func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+	// Perform any error handling if one occurred
+	if let error = error {
+		print("Characteristic value update failed: \(error.localizedDescription)")
+		return
+	}
+
+	// Retrieve the data from the characteristic
+	guard let data = characteristic.value else { return }
+
+	// Decode/Parse the data here
+	let message = String(decoding: data, as: UTF8.self)
+}
+```
+
+### Receiving Data from a Central
+Last of all, when a peripheral receives data from a central, the following method of `CBPeripheralManager` will be called:
+
+```swift
+func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveWrite requests: [CBATTRequest]) {
+	guard let request = requests.first, let data = request.value else { return }
+	
+	let message = String(decoding: data, as: UTF8.self)
+}
+```
+
+One thing of which to be extra aware is that if the characteristic was not set as writeable at its time of creation, then sending data to the peripheral will silently fail and this delegate will never be called.
+
+### Summary
+As should now be obvious, sending data over Core Bluetooth does involve quite a few steps. From the peripheral side, peripherals have to configure and advertise their services and characteristics, and manage when centrals subscribe and unsubscribe. From the central side, subscribing to a characteristic is a multi-step process from scanning for the peripheral, to connecting to the peripheral, discovering the peripheral's services, discovering the service's characteristics and then subscribing to them.
+
+But all that being said, once you understand the terminology, and how each object in the chain is related to each other, everything falls into place relatively easily.
+
+## Challenge with the Chat App
+While the above introduction to the Core Bluetooth API shows in general the basic steps of connecting a central and a peripheral, when writing the chat app, a rather large hurdle appeared immediately: who is the central and who is the peripheral?
+
+In a classic use case where a low powered sensor is connected to an iPhone, the role of central and peripheral is clear cut. However, in a connection between two iPhones, suddenly who plays which role becomes a much harder decision.
+
+One neat thing that might not be obvious from the start is that Core Bluetooth can make a device be a central and a peripheral at the same time, in that it is simultaneously both scanning and advertising.
+
+// Show a screenshot of the discovery view controller
+
+When a device has opened the app to the device discovery screen, it will create both a central manager and a peripheral manager and will start scanning and advertising respectively. 
+
+Any devices in range will be doing the same thing, so in this way, any other devices our device detects can be shown on-screen, and likewise any other devices that detect our device will show that device on their screen.
+
+While the device discovery screen is interested in detecting all available devices we could potentially chat with, once we go into a chat session window, we only want to receive messages from the remote device we selected.
+
+In this case, when the user taps on the device they want to talk to, the hardware UUID of the selected device is saved, and the chat window is open. When both devices have opened the same chat window, a connection isn't formed yet, as both devices will be set to scan like a standard central. To avoid detecting devices advertising for the device discovery menu, a different service UUID is used.
+
+Both devices performing scanning continues to happen until the first time either participant in the chat sends a message to the chat. When this happens, that particular device becomes a peripheral and starts advertising itself as such. When this happens the other device detects the first device and connects to it like a central. In essence, whoever chats first becomes the peripheral, and whoever chats last becomes the central and the two share a single connection. During the advertisement, the perviously saved hardware UUID is used to determine the identity of the connecting device, to guarantee it wasn't someone else from a different session who happened to start broadcasting at the same time.
+
+This method might seem a bit strange. On a more pragmatic level, it might make more sense to set up and maintain 2 connections, where each device is its own central connected to another peripheral. However in practice, this can lead to more unreliably as now there are 2 connections that could potentially fail if there is any interference.
+
+## Technical Reflection
+Now that we've discussed the Core Bluetooth API and its design pattern, as well as how to modify those patterns for our own needs, it should be easy to understand its principles and how to work with it. That being said, what we've looked at here has been the bare minimum of getting Core Bluetooth moving and *would absolutely not be sufficient for a production app*. 
+
+The folks here at Ditto use Core Bluetooth in their flagship product, and by extension Bluetooth Low Energy as a whole for Android support. In addition to some of the challenges and limitations I experienced in this project, here are some of the challenges the Ditto engineers have faced as well.
+
+### Asymmetric Connections
+As mentioned above, Bluetooth operates in a very traditional client/server model with regards to centrals and peripherals. In scenarios where this model makes sense, this is fine, but like our chat app, where ideally both devices should be identical, this comes up as a limitation. With enough effort however, it is possible to build an abstraction on top of this that makes the system perform like a traditional 2-way stream.
+
+### Limited Message Sizes
+One thing I completely glossed over is that the amount of data that can be sent through a characteristic has a very hard limit, and that limit changes between devices. Historically, it's been 20 bytes, but on more modern phone hardware, it can be around 180 bytes. For a chat app where the payload is very small per message, it isn't so much of a concern, but it certainly is something that a production app needs to take seriously. Core Bluetooth is capable of detecting and  reporting the acceptable length of each message, and if a device wants to send more than that, then it's the responsibility of your own code to chunk that data up and send it as multiple messages.
+
+### Speed Limitations
+The maximum speed of communicating via GATT is only really a few kilobytes per second. Again, in our chat app, this is a limitation that we would never bump up against, but in more heavier applications, this could easily become a bottleneck quickly. Depending on your use case, you might have to optimise your message payloads to be more efficient.
+
+### Additional Speed Penalties With Reliable Delivery
+When specifying writing data to a characteristic with the `.withResponse` attribute (guaranteeing the peripheral will confirm it received the data), this roundhouse operation also incurs an additional speed penalty. For use case that require the absolute top most speed, it is usually best to rely on unreliable delivery instead and to implement your own error correction logic.
+
+### Different Levels of Control Per Platform
+While Core Bluetooth instigates its own specific policies, these may not apply to the equivalent BLE implementations on other devices such as Android. A big example of this is the limitations Core Bluetooth imposes on how much and what sort of data can be included in the advertising packets of a peripheral. As such, when building a product that might have an equivalent Android counterpart, care must be taken to ensure the interfaces behave the same way.
+
+### Security/Privacy Policies with Backgrounded Apps
+While the regular Bluetooth stack on iOS functions regardless of onscreen activity, Apple has implemented strict privacy policies on apps adopting BLE. When a peripheral device app is backgrounded, it will continue to advertise, but the "Local Name" property will no longer be included. Additionally backgrounded centrals will no longer receive repeating advertisements from any peripherals in range.
+
+This particular limitation has been a big point of contention for organisations who have been trying to build COVID-19 contact tracing apps on top of Core Bluetooth.
+
+### Extremely Complex API to Work With
+While it certainly becomes easier to work with over time, Core Bluetooth certainly isn't an easy framework to get up and running quickly with. In order to start sending and receiving data, a very long process of steps need to be followed in order to slowly capture all of the objects you need. 
+
+Compounding this, the steps are done via callbacks one after another, one at a time, and sometimes even where one delegate daisy-chains a new delegate (as is the case with `CBPeripheral`). Working out the process needed for your own use case can be very time-consuming and require a lot of cognitive load.
+
+### Demands Bullet-Proof Error Checking and Handling
+At any point of the delegate callback process, errors could easily happen that derails the whole process. As a wireless technology, Bluetooth is prone to interference, or randomly losing devices. As such, all of the delegate code needs to have bullet-proof error handling at every step in order to handle issues that can potentially occur at any step of the process. This can also sometimes potentially mean proactive heartbeats or state checks in case an expected callback failed to occur.
+
+### Occasional Instability and General Odd Behaviour
+Even though Core Bluetooth is quite old at this point, there is still some occasional odd behaviour that can happen quite reliably:
+
+* Sometimes if the sending queue is filled to capacity, a callback to say it has cleared will sometimes be skipped. This requires periodically testing the queue to see its state.
+* Certain specific devices (Like iPad mini 4 and iPhone 6) can potentially accidentally stop scanning if they are locked and then unlocked.
+
+### Lack of Encryption
+Given that some forms of data transmitted over Bluetooth could be quite private or personal (eg, a person's health records), encryption is always strongly recommended. While a form of BLE encryption exists, it is not reliable. As such, in your own implementations, you might need to consider writing your own encryption layer and all of the (error correcting) implications that would entail.
+
+## Conclusion
+When I first got the chat app working, and the text I typed on one phone automatically appeared on the other, it felt absolutely magical. I had a fantastic time learning Core Bluetooth in order to write this post, and I hope you found it useful!
+
+But at the end of this, one thing is certainly clear. Implementing your own Core Bluetooth implementation is *hard*. It involves a lot of steps, and a lot can go wrong at any moment. If you're an engineer researching Core Bluetooth because you're looking to build a new product that implements that sort of local communication, instead of rolling a new implementation from scratch, I'd recommend you consider checking out the synchronisation technology from Ditto. Ditto's tech stack has already taken care of all of the challenges listed above, and would make integrating communications into your app a breeze.
+
+Thanks for reading!
+
