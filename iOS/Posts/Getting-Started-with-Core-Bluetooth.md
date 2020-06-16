@@ -58,7 +58,7 @@ This concept of Bluetooth devices offering their capabilities as services and ch
 
 ### Core Bluetooth Concepts Summary
 
-Hopefully by this point, the basic layout of how Core Bluetooth will make sense to you. Parent devices are called centrals, and they connect to child devices known as peripherals. Peripherals manage their capabilities as services, which them themselves manage their own capabilities via characteristics.
+Hopefully by this point, the basic layout of how Core Bluetooth will make sense to you. Parent devices are called centrals, and they connect to child devices known as peripherals. Peripherals manage their capabilities as services, who then manage their own capabilities via characteristics.
 
 (Add a picture of a central linking to a peripheral)
 (Add a picture of a peripheral pointing at a service, pointing at two characteristics)
