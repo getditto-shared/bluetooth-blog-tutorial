@@ -65,7 +65,7 @@ Hopefully by this point, the basic layout of how Core Bluetooth will make sense 
 
 ## Putting it all into practice
 
-Now that we've discussed the basic concepts of Core Bluetooth, we can start putting it into practice. For this post, I've built a companion sample app around Core Bluetooth. The app is a very chat app that allows two devices to connect to each other, and to then send messages between each other. The app demonstrates how to both scan as a central, and advertise a peripheral, to then connect to each other, and to then send messages both up-stream and downstream through one pipeline.
+Now that we've discussed the basic concepts of Core Bluetooth, we can start putting it into practice. For this post, I've built a companion sample app around Core Bluetooth. The app is a very basic chat app that allows two devices to connect to each other, and to then send messages between each other. The app demonstrates how to both scan as a central, and advertise a peripheral, to then connect to each other, and to then send messages both up-stream and downstream through one pipeline.
 
 ### Getting Started
 
@@ -302,7 +302,7 @@ func peripheral(_ peripheral: CBPeripheral,
 	// Send any info to the peripheral from the central
 }
 ```
-While I don't think it is strictly explicitly required to implement this method, if you the subscription failed, it would make sense to detect this and attempt to subscribe (or even just cancel the whole connection) at this point.
+While I don't think it is strictly explicitly required to implement this method, if the subscription failed, it would make sense to detect this and attempt to subscribe (or even just cancel the whole connection) at this point.
 
 Additionally, if the central has data pending it would like to send to the peripheral, this would be best place to send it.
 
@@ -399,7 +399,7 @@ One thing I completely glossed over is that the amount of data that can be sent 
 The maximum speed of communicating via GATT is only really a few kilobytes per second. Again, in our chat app, this is a limitation that we would never bump up against, but in more heavier applications, this could easily become a bottleneck quickly. Depending on your use case, you might have to optimise your message payloads to be more efficient.
 
 ### Additional Speed Penalties With Reliable Delivery
-When specifying writing data to a characteristic with the `.withResponse` attribute (guaranteeing the peripheral will confirm it received the data), this roundhouse operation also incurs an additional speed penalty. For use case that require the absolute top most speed, it is usually best to rely on unreliable delivery instead and to implement your own error correction logic.
+When specifying writing data to a characteristic with the `.withResponse` attribute (guaranteeing the peripheral will confirm it received the data), this roundhouse operation also incurs an additional speed penalty. For use cases that require the absolute top most speed, it is usually best to rely on unreliable delivery instead and to implement your own error correction logic.
 
 ### Different Levels of Control Per Platform
 While Core Bluetooth instigates its own specific policies, these may not apply to the equivalent BLE implementations on other devices such as Android. A big example of this is the limitations Core Bluetooth imposes on how much and what sort of data can be included in the advertising packets of a peripheral. As such, when building a product that might have an equivalent Android counterpart, care must be taken to ensure the interfaces behave the same way.
