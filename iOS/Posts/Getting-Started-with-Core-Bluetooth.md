@@ -30,11 +30,17 @@ When working with Core Bluetooth, it is necessary to become accustomed with the 
 
 ### Centrals and Peripherals
 
-Bluetooth operates in a very traditional server/client sort of model. One device acts in a child capacity that produces information, and another acts as the overarching parent that receives this information and decides how to act upon it.
+Bluetooth operates in a very traditional server/client sort of model. One device acts in the capacity of a server that produces information, and another acts as a client that queries for this information and processes/displays it locally.
 
-In Bluetooth, these parent devices are referred to as “centrals” and child devices are referred to as “peripherals”. In most traditional Core Bluetooth setups, the iOS device will almost always be the central, and any BLE devices paired to the iOS device will act as a peripheral.
+In Bluetooth, accessory devices that produce and store data are called "peripherals" and devices interested in accessing that data are called "centrals". In a traditional scenario, when two devices are wanting to connect to each other, the peripheral will broadcast an advertisement about itself, and the central will be scanning for that advertisement. As a general example, when pairing a pair of Bluetooth headphones to a smartphone, the smartphone would be the central, and the headphones would be the peripheral.
 
-(Insert a picture of an iPhone and a BLE device, labeling them as such).
+(Insert a picture of an iPhone and a BLE device, labelling them as such).
+
+One very important thing to note. With the given parent/child terminology, it's very easy to assume that centrals act as the server, and peripherals act as the clients. 
+
+However, as it turns out, this terminology is really only useful when designating the role of each device when connecting. One needs to be advertising, and one needs to be scanning.
+ 
+Once a connection is formed, there is no longer any specific parent/child hierarchal relationship between the devices and both can behave as servers sending data between each other.
 
 ### Services
 
@@ -42,9 +48,9 @@ Obviously, depending on the type of BLE device in question will determine what s
 
 Most apps will be built to support one or more specific class of device capability. For example, apps for tracking a users health would have no interest in connecting to devices that aren't health related, such as a thermostat. In order to encapsulate and report on the capabilities of specific peripherals, Bluetooth requires that peripherals identify their classes or capabilities as “services”.
 
-Peripherals will make themselves discoverable to centrals by broadcasting advertisement packets containing information on the services they support. When a central scanning at the same time detects these packets and determines that the peripheral device it found supports the same services as it does, then the two devices recognize they are compatible with each other and can begin the process of connecting to each other.
+Peripherals will make themselves discoverable to centrals by broadcasting advertisement packets defining the main identifying service they offer. When a central scanning at the same time detects these packets and determines that the peripheral device it found supports the same class of service that it is searching for, then the central can determine that they it is compatible with the peripheral and can begin the process of connecting to each other. Traditionally, while only the main service of the device is advertised, once a connection is formed, the central can then query the peripheral for any additional services it offers.
 
-In order for centrals and peripherals to be able to recognize each others’ supported services as matching, it is necessary for the ID values of these services to match. For very specific apps and peripheral devices, it makes sense to define a service using a shared UUID between both devices.
+In order for the central to determine it is compatible with a peripheral, it needs to know the ID values of the services that the peripheral supports. For very specific apps and peripheral devices, it makes sense to define a service using a shared UUID between both devices.
 
 However, in more general practice, it makes sense for peripherals to adopt Bluetooth services that are a standard capability globally. For example, it would make sense that any device that records blood pressure readings could be connected to *any* Bluetooth device capable of processing that data, regardless of whoever manufactured either device. As such, for common standards, [a public database exists](https://www.bluetooth.com/specifications/gatt/services/) that lists a standardized set of service IDs that can be used between both centrals and peripherals who want to adopt a specific use case.
 
@@ -93,7 +99,7 @@ let centralManager = CBCentralManager(delegate: self, queue: nil)
  
  As you can see, an object must be designated as a delegate upon instantiation. This object must conform to `CBCentralManagerDelegate`, and upon instantiation of this central manager, all of the necessary activity needed to start using Bluetooth is started immediately.
  
- Unfortunately, at this point, we can't start advertising yet. Bluetooth spends a non-trivial amount of time setting itself up to a state it could be considered as "powered on", so immediately after this, we must wait for the first delegate callback.
+At this point, we can't start scanning yet. Bluetooth spends a non-trivial amount of time setting itself up to a state it could be considered as "powered on", so immediately after this, we must wait for the first delegate callback.
  
  ```swift
 func centralManagerDidUpdateState(_ central: CBCentralManager) {
@@ -107,11 +113,11 @@ func centralManagerDidUpdateState(_ central: CBCentralManager) {
  Scanning for peripherals is very easy. We just need to call `scanForPeripherals` and specify the services we are interested in.
  
  ```swift
-let service = CBUUID(string: "AAAA") 
+let service = CBUUID(string: "9f37e282-60b6-42b1-a02f-7341da5e2eba") 
 centralManager.scanForPeripherals(withServices: [service], options: nil]
  ```
  
- As mentioned above, services carry unique identifiers so peripherals and centrals may match them. In Core Bluetooth, these identifications are handled via the `CBUUID` object, and for this specific case, we can use a simple string as the identifier.
+ As mentioned above, services carry unique identifiers so peripherals and centrals may match them. In Core Bluetooth, these identifications are handled via the `CBUUID` object, and for this specific case, we can use a simple string as the identifier. For this tutorial, I'm using a UUID string value generated from [Online UUID Generator](https://www.uuidgenerator.net). The value needs to be globally unique, but recognizable from both peripheral and central sides.
  
  At this point, the device will now be scanning for peripherals with the same matching service identifier. At any point, a central can be checked if it is scanning by calling `centralManager.isScanning`.
  
@@ -122,7 +128,7 @@ Now that our central is scanning, we need another device acting as a peripheral 
 Similar to how centrals are managed via a `CBCentralManager`, peripherals are managed by instances of `CBPeripheralManager`.
 
 ```swift
-peripheralManager = CBPeripheralManager(delegate: self, queue: nil)
+let peripheralManager = CBPeripheralManager(delegate: self, queue: nil)
 ```
  
 And exactly the same as central managers, peripheral managers require a delegate upon creation (This time conforming to `CBPeripheralManagerDelegate`) that also must wait for the state of Bluetooth on the device to reach "powered on".
@@ -139,13 +145,13 @@ Once the state of the Bluetooth peripheral is powered on, the peripheral can the
 
 ```swift
 
-let characteristicID = CBUUID(string: "BBBB")
+let characteristicID = CBUUID(string: "890aa912-c414-440d-88a2-c7f66179589b")
 
 // Create and configure our characteristic     
 let characteristic = CBMutableCharacteristic(type: characteristicID, properties: [.write, .notify], value: nil, permissions: .writeable)
 
 // Create our service, and add our characteristic to it
-let serviceID = CBUUID(string: "AAAA")
+let serviceID = CBUUID(string: "9f37e282-60b6-42b1-a02f-7341da5e2eba")
 let service = CBMutableService(type: serviceID, primary: true)
 service.characteristics = [characteristic]
 
@@ -183,7 +189,7 @@ func centralManager(_ centralManager: CBCentralManager, didDiscover peripheral: 
 }
 ```
 
-`didDiscoverPeripheral` will provide a lot of interesting information about the peripheral. The `advertismentData` dictionary will contain information about it like the devices name and manufacturer name, in addition to all of the service UUIDs it supports.
+`didDiscoverPeripheral` will provide a lot of interesting information about the peripheral. The `advertismentData` dictionary will contain information about it like the devices name and manufacturer name, in addition to all of the service UUIDs that were defined in `CBAdvertisementDataServiceUUIDsKey` (Though there may be more we can discover later).
 
 If necessary, it's possible to check if this peripheral supports  the services this central wants by checking the value of 
 `advertisementData[CBAdvertisementDataServiceUUIDsKey]`. In addition, the RSSI value ([Received Signal Strength Indicator](https://en.wikipedia.org/wiki/Received_signal_strength_indication)) is useful in determining the distance of the peripheral. Sometimes it may be necessary to require a specific proximity for proper functioning, and this value can be used to monitor for that.
@@ -202,7 +208,7 @@ func centralManager(_ centralManager: CBCentralManager, didConnect peripheral: C
 	// Configure a delegate for the peripheral
   peripheral.delegate = self
 
-	let service = CBUUID(string: "AAAA") 
+	let service = CBUUID(string: "9f37e282-60b6-42b1-a02f-7341da5e2eba") 
   // Scan for the chat characteristic we'll use to communicate
   peripheral.discoverServices([service])
 }
@@ -218,14 +224,15 @@ Once we've set ourselves to be the delegate of a peripheral and performed the re
 
 ```swift
 func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
-	// If an error occurred, print it, and then return
+	// If an error occurred, disconnect so we can try again from the start
 	if let error = error {
 		print("Unable to discover services: \(error.localizedDescription)")
+		cleanUp()
 		return
 	}
 
 	// Specify the characteristic we want
-	let characteristic = CBUUID("BBBB")
+	let characteristic = CBUUID("890aa912-c414-440d-88a2-c7f66179589b")
 
 	// It's possible there may be more than one service, so loop through each one to discover the one that we want
 	peripheral.services?.forEach { service in
@@ -247,14 +254,15 @@ From above, once the characteristics of a service have been discovered, the foll
 
 ```swift
 func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
-	// Handle if any errors occurred
+	// If an error occurred, disconnect so we can try again from the start
 	if let error = error {
 		print("Unable to discover characteristics: \(error.localizedDescription)")
+		cleanUp()
 		return
 	}
 
 	// Specify the characteristic we want
-	let characteristicUUID = CBUUID("BBBB")
+	let characteristicUUID = CBUUID("890aa912-c414-440d-88a2-c7f66179589b")
 
 	// Perform a loop in case we received more than one characteristic
 	service.characteristics?.forEach { characteristic in
@@ -282,7 +290,7 @@ One of the final steps in the process is that the peripheral will report whether
 func peripheral(_ peripheral: CBPeripheral,
                     didUpdateNotificationStateFor characteristic: CBCharacteristic,
                     error: Error?) {
-	// Perform any error handling if one occurred
+	// Perform any error handling if one occurred. It's not necessary to abandon the connection from this kind of error
 	if let error = error {
 		print("Characteristic update notification failed: \(error.localizedDescription)")
 		return
@@ -388,9 +396,6 @@ Overall, this method might seem a bit strange. On a more pragmatic level, it mig
 Now that we've discussed the Core Bluetooth API and its design pattern, it should be easy to understand how to work with it. That being said, what we've looked at here has been the bare minimum of getting Core Bluetooth moving and *would absolutely not be sufficient for a production app*. 
 
 The folks here at Ditto use Core Bluetooth in their flagship product, and by extension, Bluetooth Low Energy itself for Android support. In addition to some of the challenges and limitations I experienced in this project, here are some of the challenges the Ditto engineers have faced as well.
-
-### Asymmetric Connections
-As mentioned above, Bluetooth operates in a very traditional client/server model with regards to centrals and peripherals. In scenarios where this model makes sense, this is fine, but like our chat app, where ideally both devices should be identical, this comes up as a limitation. With enough effort however, it is possible to build an abstraction on top of this that makes the system perform like a traditional 2-way stream.
 
 ### Limited Message Sizes
 One thing I completely glossed over is that the amount of data that can be sent through a characteristic has a very hard limit, and that limit changes between devices. Historically, it's been 20 bytes, but on more modern phone hardware, it can be around 180 bytes. For a chat app where the payload is very small per message, it isn't so much of a concern, but it certainly is something that a production app needs to take seriously. Core Bluetooth is capable of detecting and  reporting the acceptable length of each message, and if a device wants to send more than that, then it's the responsibility of your own code to chunk that data up and send it as multiple messages.
