@@ -290,7 +290,7 @@ One of the final steps in the process is that the peripheral will report whether
 func peripheral(_ peripheral: CBPeripheral,
                     didUpdateNotificationStateFor characteristic: CBCharacteristic,
                     error: Error?) {
-	// Perform any error handling if one occurred. It's not necessary to disconnect 
+	// Perform any error handling if one occurred. It's not necessary to abandon the connection from this kind of error
 	if let error = error {
 		print("Characteristic update notification failed: \(error.localizedDescription)")
 		return
