@@ -30,11 +30,17 @@ When working with Core Bluetooth, it is necessary to become accustomed with the 
 
 ### Centrals and Peripherals
 
-Bluetooth operates in a very traditional server/client sort of model. One device acts in a child capacity that produces information, and another acts as the overarching parent that receives this information and decides how to act upon it.
+Bluetooth operates in a very traditional server/client sort of model. One device acts in the capacity of a server that produces information, and another acts as a client that queries for this information and processes/displays it locally.
 
-In Bluetooth, these parent devices are referred to as “centrals” and child devices are referred to as “peripherals”. In most traditional Core Bluetooth setups, the iOS device will almost always be the central, and any BLE devices paired to the iOS device will act as a peripheral.
+In Bluetooth, accessory devices that produce and store data are called "peripherals" and devices interested in accessing that data are called "centrals". In a traditional scenario, when two devices are wanting to connect to each other, the peripheral will broadcast an advertisement about itself, and the central will be scanning for that advertisement. As a general example, when pairing a pair of Bluetooth headphones to a smartphone, the smartphone would be the central, and the headphones would be the peripheral.
 
-(Insert a picture of an iPhone and a BLE device, labeling them as such).
+(Insert a picture of an iPhone and a BLE device, labelling them as such).
+
+One very important thing to note. With the given parent/child terminology, it's very easy to assume that centrals act as the server, and peripherals act as the clients. 
+
+However, as it turns out, this terminology is really only useful when designating the role of each device when connecting. One needs to be advertising, and one needs to be scanning.
+ 
+Once a connection is formed, there is no longer any specific parent/child hierarchal relationship between the devices and both can behave as servers sending data between each other.
 
 ### Services
 
