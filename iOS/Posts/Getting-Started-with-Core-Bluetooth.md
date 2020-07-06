@@ -48,9 +48,9 @@ Obviously, depending on the type of BLE device in question will determine what s
 
 Most apps will be built to support one or more specific class of device capability. For example, apps for tracking a users health would have no interest in connecting to devices that aren't health related, such as a thermostat. In order to encapsulate and report on the capabilities of specific peripherals, Bluetooth requires that peripherals identify their classes or capabilities as “services”.
 
-Peripherals will make themselves discoverable to centrals by broadcasting advertisement packets containing information on the services they support. When a central scanning at the same time detects these packets and determines that the peripheral device it found supports the same services as it does, then the two devices recognize they are compatible with each other and can begin the process of connecting to each other.
+Peripherals will make themselves discoverable to centrals by broadcasting advertisement packets defining the main identifying service they offer. When a central scanning at the same time detects these packets and determines that the peripheral device it found supports the same class of service that it is searching for, then the central can determine that they it is compatible with the peripheral and can begin the process of connecting to each other. Traditionally, while only the main service of the device is advertised, once a connection is formed, the central can then query the peripheral for any additional services it offers.
 
-In order for centrals and peripherals to be able to recognize each others’ supported services as matching, it is necessary for the ID values of these services to match. For very specific apps and peripheral devices, it makes sense to define a service using a shared UUID between both devices.
+In order for the central to determine it is compatible with a peripheral, it needs to know the ID values of the services that the peripheral supports. For very specific apps and peripheral devices, it makes sense to define a service using a shared UUID between both devices.
 
 However, in more general practice, it makes sense for peripherals to adopt Bluetooth services that are a standard capability globally. For example, it would make sense that any device that records blood pressure readings could be connected to *any* Bluetooth device capable of processing that data, regardless of whoever manufactured either device. As such, for common standards, [a public database exists](https://www.bluetooth.com/specifications/gatt/services/) that lists a standardized set of service IDs that can be used between both centrals and peripherals who want to adopt a specific use case.
 
@@ -99,7 +99,7 @@ let centralManager = CBCentralManager(delegate: self, queue: nil)
  
  As you can see, an object must be designated as a delegate upon instantiation. This object must conform to `CBCentralManagerDelegate`, and upon instantiation of this central manager, all of the necessary activity needed to start using Bluetooth is started immediately.
  
- Unfortunately, at this point, we can't start advertising yet. Bluetooth spends a non-trivial amount of time setting itself up to a state it could be considered as "powered on", so immediately after this, we must wait for the first delegate callback.
+At this point, we can't start scanning yet. Bluetooth spends a non-trivial amount of time setting itself up to a state it could be considered as "powered on", so immediately after this, we must wait for the first delegate callback.
  
  ```swift
 func centralManagerDidUpdateState(_ central: CBCentralManager) {
