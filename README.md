@@ -21,6 +21,15 @@ __Running the iOS BluetoothChat__:
 5. Run the app __on 2 or more physical devices__, the simulator is not recommended.
 
 
-## Getting Started with Android Bluetooth 
+## Getting Started with Android Bluetooth(https://www.ditto.live/blog/posts/getting-started-with-android-ble)
 
-Coming Soon!
+### Running the sample app
+
+__Prerequisites__: 
+1. Android Studio 4.0 or higher
+2. Android API 4.3 or higher
+
+__Running the iOS BluetoothChat__:
+1. Clone this repo with `git clone https://github.com/getditto/bluetooth-blog-tutorial`
+2. In Android Studio, open the project at  `Android/BluetoothChat`
+3. Run the app __on 2 or more physical devices__, the simulator is not supported.
