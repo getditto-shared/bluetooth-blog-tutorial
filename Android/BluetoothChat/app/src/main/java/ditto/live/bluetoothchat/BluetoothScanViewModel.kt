@@ -55,7 +55,7 @@ class BluetoothScanViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /**
-     * A callback on of device scanning
+     * A callback of device scanning
      * Set our scan results for discovered devices
      */
     private inner class DeviceScanCallback : ScanCallback() {
